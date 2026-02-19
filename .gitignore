@@ -1,0 +1,16 @@
+# Data files (keep data locally, do not push to GitHub)
+data/brute/*
+data/clean/*
+data/finals/*
+
+# Keep folder structure in Git
+!data/brute/.gitkeep
+!data/clean/.gitkeep
+!data/finals/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
