@@ -1,16 +1,35 @@
-# Data files (keep data locally, do not push to GitHub)
-data/brute/*
-data/clean/*
-data/finals/*
+# ---- Python / tooling ----
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.env
+.env.*
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# Keep folder structure in Git
-!data/brute/.gitkeep
-!data/clean/.gitkeep
-!data/finals/.gitkeep
-
-# Jupyter
+# ---- Jupyter / notebooks ----
 .ipynb_checkpoints/
 
-# OS / editor
+# ---- OS ----
 .DS_Store
 Thumbs.db
+
+# ---- Data policy ----
+# Ignore everything in 1_raw and 2_interim EXCEPT .gitkeep
+data/1_raw/*
+!data/1_raw/.gitkeep
+
+data/2_interim/*
+!data/2_interim/.gitkeep
+
+# Keep 3_processed versioned (no ignore rule here)
+
+# ---- IDE ----
+.vscode/
