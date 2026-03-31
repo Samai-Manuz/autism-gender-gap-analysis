@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "autism-diagnosis-gender-gap"
+name = "autism-gender-gap-analysis"
 version = "0.1.0"
-description = "Data analysis project on autism diagnosis gender gap"
+description = "Data analysis project on autism gender gap using GBD/IHME data"
 requires-python = ">=3.10"
 
 [tool.setuptools]

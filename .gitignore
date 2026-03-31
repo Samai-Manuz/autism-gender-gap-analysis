@@ -3,13 +3,21 @@ __pycache__/
 *.py[cod]
 *.pyd
 *.so
+
+# Packaging metadata (editable installs)
 *.egg-info/
+*.egg
+
 dist/
 build/
+
+# Virtual environments
 .venv/
 venv/
 .env
 .env.*
+
+# Caches
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -22,14 +30,14 @@ venv/
 Thumbs.db
 
 # ---- Data policy ----
-# Ignore everything in 1_raw and 2_interim EXCEPT .gitkeep
+# Ignore raw and interim data (except .gitkeep)
 data/1_raw/*
 !data/1_raw/.gitkeep
 
 data/2_interim/*
 !data/2_interim/.gitkeep
 
-# Keep 3_processed versioned (no ignore rule here)
+# Keep processed data versioned
 
 # ---- IDE ----
 .vscode/
