@@ -112,24 +112,26 @@ data/3_processed/oecd_regions.csv
 
 ## 🧱 Repository Structure
 
+```text
 autism-gender-gap-analysis/
 │
 ├── data/
-│ ├── 1_raw/
-│ ├── 2_interim/
-│ └── 3_processed/
+│   ├── 1_raw/
+│   ├── 2_interim/
+│   └── 3_processed/
 │
 ├── notebooks/
-│ ├── 01_gbd_download_oecd.ipynb
-│ ├── 02_asd_etl_oecd.ipynb
-│ ├── 03_metrics_sex_age.ipynb
-│ └── 04_analysis_visuals.ipynb
+│   ├── 01_gbd_download_oecd.ipynb
+│   ├── 02_asd_etl_oecd.ipynb
+│   ├── 03_metrics_sex_age.ipynb
+│   └── 04_analysis_visuals.ipynb
 │
 ├── reports/
-│ └── figures/
+│   └── figures/
 │
 ├── src/
-│ └── paths.py
+│   └── paths.py
+```
 
 > Minimal `src` by design (no over-engineering).
 
