@@ -1,11 +1,6 @@
 # Autism Gender Gap Analysis (OECD · GBD/IHME)
 
-**End-to-end analysis of ASD prevalence by gender, age, and geography** using Global Burden of Disease (IHME) data.
-
-This project is designed to demonstrate:
-- analytical rigor  
-- structured decision-making  
-- reproducible and scalable data workflows  
+**End-to-end analysis of ASD prevalence by gender, age, and geography**, evolving from exploratory analysis to a structured **data warehouse (star schema) + BI layer**.
 
 ---
 
@@ -13,26 +8,13 @@ This project is designed to demonstrate:
 
 To analyze gender differences in ASD prevalence and evaluate how they vary:
 
-- across **age groups**  
-- over **time**  
-- across **countries** and **regions**  
+* across **age groups**
+* over **time**
+* across **countries** and **regions**
 
-With a specific focus on:
+With a focus on:
 
-> Exploring whether observed gender gaps may be partially explained by **late diagnosis in women**.
-
----
-
-## 👤 Context
-
-I am **Samai Manuz Rodríguez**, a late-diagnosed autistic woman.
-
-This project is also motivated by a well-documented issue in research:
-
-> Autism in women is often underdiagnosed or diagnosed later in life.
-
-The approach is **analytical (not clinical)**:  
-data is used to identify patterns consistent with this hypothesis, not to establish causality.
+> Identifying patterns consistent with **potential late diagnosis in women** using robust, reproducible data pipelines.
 
 ---
 
@@ -40,80 +22,78 @@ data is used to identify patterns consistent with this hypothesis, not to establ
 
 ### ✔ Core dataset — IHME Global Burden of Disease (GBD)
 
-Selected because it provides:
+* Global coverage
+* Standardized methodology
+* Segmentation: country · year · sex · age
+* Time series: **1990–2023**
 
-- global coverage  
-- standardized methodology  
-- segmentation by country, year, sex and age  
-- long-term time series (1990–2023)  
+**Limitation:**
 
-**Key limitation:**
-- uses **modeled prevalence**, not real **diagnosis timing**
-
-👉 Best available backbone for **international comparability**
+* Modeled prevalence (not diagnosis timing)
 
 ---
 
-## 🔎 Sources considered (global analysis)
+## 🌍 Country Selection
 
-Several institutional sources were evaluated using strict criteria (coverage, segmentation, comparability, methodology):
+✔ OECD countries selected:
 
-- **WHO (World Health Organization)** → too aggregated, low granularity  
-- **CDC (ADDM, United States)** → high quality but single-country scope  
-- **Eurostat** → proxy variables, not direct ASD diagnosis  
-- **ECDC** → heterogeneous and not ASD-specific  
-- **National datasets (UK, Australia, INE, etc.)** → not comparable across countries  
-
-### 🔴 Key conclusion
-
-> There is currently no global, standardized dataset that provides ASD diagnosis by year + sex + age.
-
-👉 Therefore, a **layered approach** is used:
-- GBD → global comparability  
-- other sources → contextual support  
+* Comparable healthcare systems
+* Similar diagnostic infrastructure
+* Better cross-country consistency
 
 ---
 
-## 🌍 Country Selection Strategy
+## 🧱 Data Architecture 
 
-Different approaches were evaluated:
+The project evolves from notebook-based analysis to a **star schema in MySQL**:
 
-- **GBD SDI (Socio-Demographic Index)** → continuous but less interpretable  
-- **World Bank (High-income countries)** → categorical and less flexible  
-- **OECD countries** → ✔ **selected**
+### 🔹 Dimension table
 
-### ✔ Why OECD
+**dim_country**
 
-- comparable healthcare systems  
-- similar diagnostic capacity  
-- better structural consistency  
+* `country_id` (PK)
+* `country`
+* `region`
 
 ---
 
-### ⚠️ Data extraction constraint
+### 🔹 Fact table
 
-Attempts to use scraping/APIs were blocked by anti-bot policies.
+**fact_asd_prevalence**
 
-### ✔ Solution
-
-Manual extraction and dataset creation:
-
-data/3_processed/oecd_members.csv
-
----
-
-## 🌐 Regional Aggregation
-
-Custom dataset grouping OECD countries into regions:
-
-data/3_processed/oecd_regions.csv
+* `id` (PK)
+* `year`
+* `gender`
+* `age_range`
+* `prevalence`
+* `lower_ui`
+* `upper_ui`
+* `country_id` (FK → dim_country)
 
 ---
 
-## 🧱 Repository Structure
+### 🔹 Model characteristics
+
+* ✔ Star schema (dim → fact)
+* ✔ 1:N relationship
+* ✔ Analytical grain:
+
+```
+(year, gender, age_range, country)
+```
+
+* ✔ Unique constraint enforced:
+
+```
+UNIQUE(year, gender, age_range, country_id)
+```
+
+---
+
+## 🧱 Repository Structure 
 
 ```text
-autism-gender-gap-analysis/
+autism-diagnosis-gender-gap/
 │
 ├── data/
 │   ├── 1_raw/
@@ -126,88 +106,169 @@ autism-gender-gap-analysis/
 │   ├── 03_metrics_sex_age.ipynb
 │   └── 04_analysis_visuals.ipynb
 │
-├── reports/
-│   └── figures/
+├── sql/
+│   ├── 01_schema.sql
+│   ├── 02_constraints.sql
+│   └── 03_validation.sql
 │
 ├── src/
-│   └── paths.py
+│   ├── paths.py
+│   └── load_to_mysql.py
+│
+├── reports/
+│   └── figures/
 ```
 
-> Minimal `src` by design (no over-engineering).
+---
+
+## 🔄 Data Pipeline (END-TO-END)
+
+### 1. Data Extraction
+
+* Manual download from GBD (OECD filter)
 
 ---
 
-## 🔄 Data Pipeline
+### 2. ETL (Python)
 
-1. Download (GBD extraction)  
-2. ETL (cleaning, normalization, validation)  
-3. Metrics:
-   - **difference** → absolute gap (Male − Female)  
-   - **ratio** → relative relationship (Female / Male)  
-   - **pct** → computed but excluded (redundant)  
-4. Analysis and visualization  
+* Cleaning and normalization
+* Country standardization
+* Age bin normalization
+* Metric renaming:
+
+  * `val → prevalence`
+  * `upper → upper_ui`
+  * `lower → lower_ui`
 
 ---
 
-## 📈 Key Findings
+### 3. Load to MySQL 
 
-- Male prevalence > Female across all dimensions  
+Implemented via:
 
-**Over time:**
-- Difference ↑ (absolute gap widens)  
-- Ratio ↓ (female share declines)  
+```bash
+src/load_to_mysql.py
+```
 
-**With age:**
-- Prevalence decreases  
-- Absolute gap narrows  
+#### ✔ Key characteristics
+
+* ✔ Idempotent pipeline
+* ✔ Uses:
+
+```sql
+INSERT IGNORE
+```
+
+* ✔ Based on UNIQUE KEY constraint
+* ✔ Safe re-execution (no duplicates)
+
+---
+
+### 4. Data Warehouse (MySQL)
+
+Database:
+
+```
+asd_analysis
+```
+
+Validated:
+
+* ✔ 38 countries
+* ✔ 38,760 rows in fact table
+* ✔ No duplicates
+
+---
+
+### 5. Validation Layer (SQL)
+
+Scripts:
+
+* `01_schema.sql` → table creation
+* `02_constraints.sql` → PK, FK, UNIQUE
+* `03_validation.sql` → integrity checks
+
+---
+
+### 6. BI Layer — Power BI 
+
+* Connection via native MySQL connector
+* Star schema preserved (no transformations in BI)
+* Power BI used strictly as:
+
+  * visualization layer
+  * analytical interface
+
+---
+
+## 📈 Analytical Metrics
+
+Computed in pipeline:
+
+* **difference** → Male − Female
+* **ratio** → Female / Male
+
+---
+
+## 📊 Key Findings
+
+* Male prevalence > Female across all dimensions
+
+**Time:**
+
+* Absolute gap ↑
+* Relative ratio ↓
+
+**Age:**
+
+* Prevalence decreases
+* Gap narrows
 
 ---
 
 ## 🔍 Core Insight
 
-> The gender gap cannot be described using a single metric.
+> A single metric is insufficient to explain the gender gap.
 
-- Difference and ratio provide **complementary perspectives**  
-- Both are required for correct interpretation  
+* Absolute and relative metrics must be combined
 
 ---
 
-## ⚠️ Scope & Limitations
+## ⚠️ Limitations
 
-- Uses **modeled prevalence**, not diagnosis timing  
-- Gender limited to **biological sex**  
-- No segmentation by gender identity  
-- No race/ethnicity due to lack of comparable global data  
+* Modeled prevalence (not diagnosis timing)
+* Binary sex only
+* No ethnicity segmentation
+* OECD-only scope
 
 ---
 
 ## 🚀 Next Steps
 
-- Power BI / Tableau dashboards (interactive analysis)  
+* Build Power BI dashboards:
 
-### ✔ Hypothesis to explore
+  * Time trends
+  * Age distributions
+  * Country comparisons
+* Export dashboards for portfolio:
 
-> Higher relative prevalence in adult women → potential signal of late diagnosis  
-
-### ✔ Scalability
-
-- extend beyond OECD  
-- integrate clinical/diagnostic datasets (when available)  
-  - key challenge: matching global coverage + sex/age/time segmentation  
+  * `.pbix`
+  * PDF / PNG
 
 ---
 
 ## 📦 Output
 
-All figures are exported to:
-
+```text
 reports/figures/
+```
 
 ---
 
 ## ✔ Project Value
 
-- structured analytical thinking  
-- clear decision framework  
-- iterative problem-solving  
-- reproducible workflow + clean visuals  
+* End-to-end pipeline (ETL → DWH → BI)
+* Real-world data modeling (star schema)
+* Idempotent data engineering practices
+* Clean analytical design
+* Portfolio-ready structure
