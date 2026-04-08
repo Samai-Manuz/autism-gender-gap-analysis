@@ -7,6 +7,7 @@
 --
 -- Design rationale:
 -- - dim_country: stores descriptive attributes (dimension table)
+-- - dim_age: groups age ranges into life stages (derived dimension)
 -- - fact_asd_prevalence: stores measurable events (fact table)
 --
 -- Benefits:
@@ -25,7 +26,7 @@ USE asd_analysis;
 -- Create dimension table for countries
 -- Stores unique list of countries and their region
 
-CREATE TABLE dim_country (
+CREATE TABLE IF NOT EXISTS dim_country (
     country_id INT AUTO_INCREMENT PRIMARY KEY,
     country VARCHAR(50) NOT NULL,
     region VARCHAR(50) NOT NULL,
@@ -33,10 +34,19 @@ CREATE TABLE dim_country (
 );
 
 
+-- Create dimension table for age
+-- Groups age ranges into broader life stages for analysis
+
+CREATE TABLE IF NOT EXISTS dim_age (
+    age_range VARCHAR(10) PRIMARY KEY,
+    life_stage VARCHAR(20) NOT NULL
+);
+
+
 -- Create fact table for ASD prevalence
 -- Stores measurements linked to country and time dimensions
 
-CREATE TABLE fact_asd_prevalence (
+CREATE TABLE IF NOT EXISTS fact_asd_prevalence (
     id INT AUTO_INCREMENT PRIMARY KEY,
     year INT NOT NULL,
     gender VARCHAR(10) NOT NULL,
