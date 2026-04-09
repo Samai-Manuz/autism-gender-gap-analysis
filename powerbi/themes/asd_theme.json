@@ -1,0 +1,28 @@
+{
+  "name": "ASD Analysis Theme",
+  "dataColors": [
+    "#2E7D32",
+    "#7B1FA2",
+    "#000000",
+    "#666666",
+    "#E0E0E0"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#333333",
+  "tableAccent": "#2E7D32",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "fontFamily": "Segoe UI",
+        "fontSize": 12,
+        "color": [
+          {
+            "solid": {
+              "color": "#333333"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
