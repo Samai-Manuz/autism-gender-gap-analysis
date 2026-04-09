@@ -9,23 +9,5 @@
   ],
   "background": "#FFFFFF",
   "foreground": "#333333",
-  "tableAccent": "#2E7D32",
-  "visualStyles": {
-    "*": {
-      "*": {
-        "titleText": [
-          {
-            "fontFamily": "Segoe UI",
-            "color": { "solid": { "color": "#333333" } }
-          }
-        ],
-        "labels": [
-          {
-            "fontFamily": "Segoe UI",
-            "color": { "solid": { "color": "#333333" } }
-          }
-        ]
-      }
-    }
-  }
+  "tableAccent": "#2E7D32"
 }
